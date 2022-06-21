@@ -15,7 +15,7 @@ public class NormalAccount extends Account{
     
     
    public double calculInterest(){
-       return this.solde-=(this.solde*this.interest);
+       return (this.solde*this.interest);
    } 
     
    public NormalAccount(String owner,String number,double solde,double interest){

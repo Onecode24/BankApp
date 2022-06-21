@@ -1,8 +1,10 @@
 package bank;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -37,8 +39,9 @@ public class Dashboard extends javax.swing.JFrame {
         newPay = new PayView();
         newWithdraw = new WithdrawView();
         newOver = new Overview();
+        this.setResizable(false);
         setPanel(newAccount);
-       
+        setActive(this.jPanel10);
     }
     
     public ArrayList<Account> getAccounts(){
@@ -333,6 +336,7 @@ public class Dashboard extends javax.swing.JFrame {
         account.setFont(new java.awt.Font("DejaVu Sans", 0, 16)); // NOI18N
         account.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ressources/icons8-cartes-bancaires-32.png"))); // NOI18N
         account.setText("   Accounts");
+        account.setBorder(null);
         account.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 accountMouseClicked(evt);
@@ -542,26 +546,31 @@ public class Dashboard extends javax.swing.JFrame {
     private void depositMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_depositMouseClicked
         newDeposit = new DepositView(this.getAccounts());
         setPanel(newDeposit);
+        setActive(this.jPanel4);
     }//GEN-LAST:event_depositMouseClicked
 
     private void accountMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_accountMouseClicked
         newAccount = new AccountView(this.getAccounts());
         setPanel(newAccount);
+        setActive(this.jPanel10);
     }//GEN-LAST:event_accountMouseClicked
 
     private void withdrawMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_withdrawMouseClicked
         newWithdraw = new WithdrawView(this.getAccounts());
         setPanel(newWithdraw);
+        setActive(this.jPanel6);
     }//GEN-LAST:event_withdrawMouseClicked
 
     private void loanMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_loanMouseClicked
         newLoan = new LoanView(this.getAccounts());
         setPanel(newLoan);
+        setActive(this.jPanel7);
     }//GEN-LAST:event_loanMouseClicked
 
     private void payloanMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_payloanMouseClicked
         newPay = new PayView(this.getAccounts());
         setPanel(newPay);
+        setActive(this.jPanel8);
     }//GEN-LAST:event_payloanMouseClicked
 
     private void payloan1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_payloan1MouseClicked
@@ -587,6 +596,7 @@ public class Dashboard extends javax.swing.JFrame {
     private void account2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_account2MouseClicked
         newOver = new Overview(this.getAccounts());
         setPanel(newOver);
+        setActive(this.jPanel3);
     }//GEN-LAST:event_account2MouseClicked
 
     private void account2MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_account2MouseEntered
@@ -641,6 +651,7 @@ public class Dashboard extends javax.swing.JFrame {
     }
 
     public void setPanel(JPanel panel){
+        this.Container.removeAll();
         newAccount.setVisible(false);
         newDeposit.setVisible(false);
         newWithdraw.setVisible(false);
@@ -650,10 +661,21 @@ public class Dashboard extends javax.swing.JFrame {
         int x = this.Container.getWidth();
         int y = this.Container.getHeight();
         this.Container.add(panel);
-        panel.setBounds(25,11,x,y);
+        panel.setBounds(0,-10,x,y);
         panel.setVisible(true);
     }
     
+    public void setActive(JPanel panel){
+        this.jPanel3.setBorder(BorderFactory.createMatteBorder(0,0,0,0,Color.white));
+        this.jPanel4.setBorder(BorderFactory.createMatteBorder(0,0,0,0,Color.white));
+        this.jPanel6.setBorder(BorderFactory.createMatteBorder(0,0,0,0,Color.white));
+        this.jPanel7.setBorder(BorderFactory.createMatteBorder(0,0,0,0,Color.white));
+        this.jPanel8.setBorder(BorderFactory.createMatteBorder(0,0,0,0,Color.white));
+        this.jPanel9.setBorder(BorderFactory.createMatteBorder(0,0,0,0,Color.white));
+        this.jPanel10.setBorder(BorderFactory.createMatteBorder(0,0,0,0,Color.white));
+
+        panel.setBorder(BorderFactory.createMatteBorder(0,0,0,8,Color.decode("#fa8005")));
+    }            
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel Container;
     private javax.swing.JPanel MenuPanel;
