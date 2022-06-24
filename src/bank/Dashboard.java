@@ -575,6 +575,7 @@ public class Dashboard extends javax.swing.JFrame {
 
     private void payloan1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_payloan1MouseClicked
         this.dispose();
+        new Login().setVisible(true);
     }//GEN-LAST:event_payloan1MouseClicked
 
     private void payloan1MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_payloan1MouseEntered
