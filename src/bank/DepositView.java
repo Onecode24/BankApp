@@ -7,16 +7,14 @@ package bank;
 import static java.lang.Double.parseDouble;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
+import java.sql.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-/**
- *
- * @author angelo
- */
 public class DepositView extends javax.swing.JPanel {
 
-    /**
-     * Creates new form DepositView
-     */
+    private Connection connect; 
+    
     private ArrayList<Account> list; 
     
     public DepositView() {
@@ -51,8 +49,6 @@ public class DepositView extends javax.swing.JPanel {
         jLabel4 = new javax.swing.JLabel();
         montantText = new javax.swing.JTextField();
         depositButton = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
-        AccountList = new javax.swing.JComboBox<>();
         jLabel5 = new javax.swing.JLabel();
 
         numberText.addActionListener(new java.awt.event.ActionListener() {
@@ -85,21 +81,6 @@ public class DepositView extends javax.swing.JPanel {
             }
         });
 
-        jLabel1.setFont(new java.awt.Font("DejaVu Sans", 0, 15)); // NOI18N
-        jLabel1.setText("Account type :");
-
-        AccountList.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Normal", "Sparing" }));
-        AccountList.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                AccountListMouseClicked(evt);
-            }
-        });
-        AccountList.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                AccountListActionPerformed(evt);
-            }
-        });
-
         jLabel5.setFont(new java.awt.Font("DejaVu Sans", 3, 24)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(102, 102, 102));
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -113,20 +94,15 @@ public class DepositView extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(127, 127, 127)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(AccountList, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addGroup(layout.createSequentialGroup()
-                                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(numberText))
-                                .addGroup(layout.createSequentialGroup()
-                                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(montantText, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addComponent(numberText))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(montantText, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(82, 82, 82)
                         .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 429, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -140,19 +116,15 @@ public class DepositView extends javax.swing.JPanel {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(12, 12, 12)
                 .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(AccountList, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(44, 44, 44)
+                .addGap(30, 30, 30)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(numberText, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(40, 40, 40)
+                .addGap(59, 59, 59)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(montantText, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addGap(63, 63, 63)
                 .addComponent(depositButton, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(50, 50, 50))
         );
@@ -168,7 +140,7 @@ public class DepositView extends javax.swing.JPanel {
 
     private void depositButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_depositButtonMouseClicked
 
-        String number = this.numberText.getText();
+        /*String number = this.numberText.getText();
         String montant = this.montantText.getText();
         if(number.isEmpty() || montant.isEmpty()){
             JOptionPane.showMessageDialog(this, "All field is required",number, HEIGHT);
@@ -198,27 +170,61 @@ public class DepositView extends javax.swing.JPanel {
             }catch(NumberFormatException e){
                 JOptionPane.showMessageDialog(this,"Amount Invalid");
             }
+        }*/
+        if(this.montantText.getText().isEmpty() || this.numberText.getText().isEmpty()){
+            JOptionPane.showMessageDialog(this, "All field is required");
+        }else{
+            
+            try {
+                connect = new DBConnection().open();
+                Statement stmt = connect.createStatement();
+                String req="SELECT Number,Solde FROM Accounts";
+                ResultSet res = stmt.executeQuery(req);
+                boolean bool =false;
+
+                Double montant = parseDouble(this.montantText.getText()); 
+                if(montant<=0){
+                    JOptionPane.showMessageDialog(this, "Amount Invalid");
+                }else{
+                    while(res.next()){
+                        if(res.getString(1).equals(this.numberText.getText())){
+                            Double solde = res.getDouble(2);
+                            req = "UPDATE Accounts SET Solde="+(solde+montant)+" WHERE Number = "+res.getString(1);
+                            PreparedStatement pst = connect.prepareStatement(req);
+                            pst.executeUpdate();
+                            JOptionPane.showMessageDialog(this, "Your Solde is :"+(solde+montant));
+                            this.numberText.setText("");
+                            this.montantText.setText("");
+                            bool = true;
+                            break;
+                        }
+                    }
+                }
+
+                if(!bool){
+                    JOptionPane.showMessageDialog(this, "Account Number not exist");
+                }
+
+
+            } catch (SQLException ex) {
+                Logger.getLogger(DepositView.class.getName()).log(Level.SEVERE, null, ex);
+            }catch(NumberFormatException e){
+                JOptionPane.showMessageDialog(this,"Amount invalid");
+            }
         }
+        
+        
+        
+        
     }//GEN-LAST:event_depositButtonMouseClicked
 
     private void depositButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_depositButtonActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_depositButtonActionPerformed
 
-    private void AccountListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_AccountListMouseClicked
-        // TODO add your handling code here:
-        
-    }//GEN-LAST:event_AccountListMouseClicked
-
-    private void AccountListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AccountListActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_AccountListActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox<String> AccountList;
     private javax.swing.JButton depositButton;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;

@@ -6,6 +6,9 @@ package bank;
 
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
+import java.sql.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -13,9 +16,8 @@ import javax.swing.JOptionPane;
  */
 public class Overview extends javax.swing.JPanel {
 
-    /**
-     * Creates new form Overview
-     */
+    private Connection connect;
+    
     private ArrayList<Account> list;
     
     public Overview() {
@@ -120,7 +122,7 @@ public class Overview extends javax.swing.JPanel {
     }//GEN-LAST:event_accountNumberActionPerformed
 
     private void checkButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_checkButtonMouseClicked
-       String number = this.accountNumber.getText();
+       /*String number = this.accountNumber.getText();
        String loanText= "",text="";
        int n=1;
        boolean check = false;
@@ -134,8 +136,29 @@ public class Overview extends javax.swing.JPanel {
                this.descriptionArea.setText(text+loanText);
                //System.out.println("check account"+list.size());
            }
-       }
+       }*/
        //System.out.println("clicked");
+       String number = this.accountNumber.getText();
+       String text="",loanText="";
+       if(number.isEmpty()) JOptionPane.showMessageDialog(this, "Entez Account Number");
+       else{
+           try {
+               connect =new DBConnection().open();
+               Statement state = connect.createStatement();
+               ResultSet res = state.executeQuery("SELECT * FROM Accounts WHERE Number="+number);
+               res.next();
+               text+="Owner : "+res.getString(1)+"\nSolde : "+res.getDouble(3)+"\nInterest :"+res.getDouble(3)*res.getDouble(4)+"\n\n";
+               res = state.executeQuery("SELECT * FROM Loan WHERE Number="+number);
+               while(res.next()){
+                   loanText+="Loan "+res.getInt(1)+" \n Amount : "+res.getDouble(2)+"\n Mensuality : "+res.getDouble(3)+"\n";
+               }
+               this.descriptionArea.setText(text+loanText);
+               
+           } catch (SQLException ex) {
+               Logger.getLogger(Overview.class.getName()).log(Level.SEVERE, null, ex);
+               JOptionPane.showMessageDialog(this, "Account Number not exist");
+           }
+       }
     }//GEN-LAST:event_checkButtonMouseClicked
 
     private void checkButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkButtonActionPerformed

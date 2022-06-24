@@ -5,7 +5,10 @@
 package bank;
 
 import static java.lang.Double.parseDouble;
+import java.sql.*;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
@@ -14,9 +17,7 @@ import javax.swing.JOptionPane;
  */
 public class LoanView extends javax.swing.JPanel {
 
-    /**
-     * Creates new form LoanView
-     */
+    private Connection connect; 
     ArrayList<Account> list;
     
     public LoanView() {
@@ -50,7 +51,7 @@ public class LoanView extends javax.swing.JPanel {
         jLabel3 = new javax.swing.JLabel();
 
         jLabel2.setFont(new java.awt.Font("DejaVu Sans", 0, 15)); // NOI18N
-        jLabel2.setText("Number");
+        jLabel2.setText("Account Number:");
 
         numberText.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -159,7 +160,7 @@ public class LoanView extends javax.swing.JPanel {
     }//GEN-LAST:event_mensualityTextActionPerformed
 
     private void ValiderMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ValiderMouseClicked
-        String number = this.numberText.getText();
+        /*String number = this.numberText.getText();
         String montant = this.montantText.getText();
         String mensuality = this.mensualityText.getText();
         if(number.isEmpty() || montant.isEmpty() || mensuality.isEmpty()){
@@ -192,7 +193,70 @@ public class LoanView extends javax.swing.JPanel {
             }catch(NumberFormatException e){
                 JOptionPane.showMessageDialog(this, "Amount or Mensuality not Valid", number, HEIGHT);
             }
+        }*/
+        connect = new DBConnection().open();
+        if(this.numberText.getText().isEmpty() || this.montantText.getText().isEmpty() || this.mensualityText.getText().isEmpty() ){
+            JOptionPane.showMessageDialog(this,"All field are required");
+            
+        }else{
+            try{
+                double montante = parseDouble(this.montantText.getText());
+                double mensual = parseDouble(this.mensualityText.getText());
+                
+                //Get number of Loan for one Account 
+                String reqs = "SELECT COUNT(id) from Loan WHERE Number="+this.numberText.getText();
+                Statement st = connect.createStatement();
+                ResultSet rest = st.executeQuery(reqs);
+                rest.next();
+                int count=rest.getInt(1);
+                System.out.println(count);
+                
+                
+                String req = "SELECT Number from Accounts";
+                boolean bool = false;
+                Statement stm=connect.createStatement();
+                ResultSet res = stm.executeQuery(req);
+                
+                while(res.next()){
+                    if(res.getString(1).equals(this.numberText.getText())){
+
+                        try{
+                            req = "INSERT INTO Loan(id,Amount,Mensuality,Number) VALUES(?,?,?,?)";
+                            PreparedStatement state = connect.prepareStatement(req);
+                            state.setInt(1, count+1);
+                            state.setString(4, this.numberText.getText());
+                            state.setDouble(2, montante);
+                            state.setDouble(3, mensual);
+                            state.executeUpdate();
+                            JOptionPane.showMessageDialog(this, "New Loan add to account "+this.numberText.getText());
+                            bool =true;
+                            this.mensualityText.setText("");
+                            this.montantText.setText("");
+                            this.numberText.setText("");
+                        }catch(SQLException e){
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                if(!bool){
+                    JOptionPane.showMessageDialog(this, "Account Number Invalid");
+                }
+                
+            }catch(SQLException ex){
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Account Number Invalid");
+            }catch(NumberFormatException e){
+                JOptionPane.showMessageDialog(this,"Amount or Mensuality invalid");
+            }
         }
+        
+        try {
+            this.connect.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(LoanView.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
     }//GEN-LAST:event_ValiderMouseClicked
 
     private void ValiderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ValiderActionPerformed

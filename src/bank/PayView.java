@@ -4,19 +4,19 @@
  */
 package bank;
 
+import static java.lang.Double.parseDouble;
 import static java.lang.Integer.parseInt;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
+import java.sql.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-/**
- *
- * @author angelo
- */
+
 public class PayView extends javax.swing.JPanel {
 
-    /**
-     * Creates new form PayView
-     */
+    private Connection connect;
+    
     private ArrayList<Account> list;
     
     public PayView() {
@@ -55,7 +55,7 @@ public class PayView extends javax.swing.JPanel {
         jLabel3 = new javax.swing.JLabel();
 
         jLabel2.setFont(new java.awt.Font("DejaVu Sans", 0, 15)); // NOI18N
-        jLabel2.setText("Number");
+        jLabel2.setText("Account Number:");
 
         numberText.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -168,7 +168,7 @@ public class PayView extends javax.swing.JPanel {
     }//GEN-LAST:event_loanNumberActionPerformed
 
     private void payBouttonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_payBouttonMouseClicked
-        String number = this.numberText.getText();
+        /*String number = this.numberText.getText();
         String loan = this.loanNumber.getText();
         int num=1;
         String text="";
@@ -210,6 +210,81 @@ public class PayView extends javax.swing.JPanel {
                 }
             }catch(NumberFormatException e){
                 JOptionPane.showMessageDialog(this,"Loan Number Invalid");
+            }
+        }*/
+        
+        String number = this.numberText.getText();
+        String loan = this.loanNumber.getText();
+        
+        if(this.payList.getSelectedItem().toString().equals("All")){
+            if(this.numberText.getText().isEmpty()) JOptionPane.showMessageDialog(this, "Account Number required");
+            else{
+                try {
+                    connect = new DBConnection().open();
+                    Statement stmt = connect.createStatement();
+                    String req="SELECT Amount,Number,Mensuality FROM Loan";
+                    ResultSet res = stmt.executeQuery(req);
+                    boolean bool =false;
+
+                    //Double montant = parseDouble(this.montantText.getText()); 
+
+                        while(res.next()){
+                            if(res.getString(2).equals(this.numberText.getText())){
+                                Double solde = res.getDouble(1);
+                                Double mensu = res.getDouble(3);
+                                Double sum =(solde-mensu);
+                                if(sum<=0) sum=0d;
+                                req = "UPDATE Loan SET Amount="+sum+" WHERE Number = "+res.getString(2);
+                                PreparedStatement pst = connect.prepareStatement(req);
+                                pst.executeUpdate();
+                                JOptionPane.showMessageDialog(this, "Operation done");
+                                this.numberText.setText("");
+                                this.loanNumber.setText("");
+                                bool = true;
+                            }
+                        }
+
+                    if(!bool){
+                        JOptionPane.showMessageDialog(this, "No Loan for this Account Number");
+                    }
+
+
+                } catch (SQLException ex) {
+                    Logger.getLogger(DepositView.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }else{
+            try {
+                connect = new DBConnection().open();
+                Statement stmt = connect.createStatement();
+                String req="SELECT * FROM Loan ";
+                ResultSet res = stmt.executeQuery(req);
+                boolean bool =false;
+
+                //Double montant = parseDouble(this.montantText.getText()); 
+                    int n =parseInt(this.loanNumber.getText());
+                    while(res.next()){
+                        if(res.getString(4).equals(this.numberText.getText()) && res.getInt(1)==n){
+                            Double solde = res.getDouble(2);
+                            Double mensu = res.getDouble(3);
+                            req = "UPDATE Loan SET Amount="+(solde-mensu)+" WHERE Number = "+res.getString(4)+" AND id="+res.getString(1);
+                            PreparedStatement pst = connect.prepareStatement(req);
+                            pst.executeUpdate();
+                            JOptionPane.showMessageDialog(this, "Operation done");
+                            this.numberText.setText("");
+                            this.loanNumber.setText("");
+                            bool = true;
+                        }
+                    }
+
+                if(!bool){
+                    JOptionPane.showMessageDialog(this, "Account Number Or Loan id not exist");
+                }
+                
+            } catch (SQLException ex) {
+                Logger.getLogger(DepositView.class.getName()).log(Level.SEVERE, null, ex);
+            }catch(NumberFormatException e){
+                JOptionPane.showMessageDialog(this, "Loan Number invalide");
             }
         }
         

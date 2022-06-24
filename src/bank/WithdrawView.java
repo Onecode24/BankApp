@@ -5,8 +5,15 @@
 package bank;
 
 import static java.lang.Double.parseDouble;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import java.sql.Connection;
 
 /**
  *
@@ -14,6 +21,7 @@ import javax.swing.JOptionPane;
  */
 public class WithdrawView extends javax.swing.JPanel {
 
+     private Connection connect;
     /**
      * Creates new form WithdrawView
      */
@@ -47,7 +55,7 @@ public class WithdrawView extends javax.swing.JPanel {
         jLabel6 = new javax.swing.JLabel();
 
         jLabel2.setFont(new java.awt.Font("DejaVu Sans", 0, 15)); // NOI18N
-        jLabel2.setText("Number :");
+        jLabel2.setText("Account Number :");
 
         accountNumber.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -135,7 +143,7 @@ public class WithdrawView extends javax.swing.JPanel {
     }//GEN-LAST:event_montantTextActionPerformed
 
     private void depositMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_depositMouseClicked
-        String number = this.accountNumber.getText();
+        /*String number = this.accountNumber.getText();
         String montant = this.montantText.getText();
         if(number.isEmpty() || montant.isEmpty()){
             JOptionPane.showMessageDialog(this, "All fiels is required", number, HEIGHT);
@@ -171,11 +179,67 @@ public class WithdrawView extends javax.swing.JPanel {
             }catch(NumberFormatException e){
                  JOptionPane.showMessageDialog(this,"Montant Invalid");
             }
+        }*/
+        
+        if(this.montantText.getText().isEmpty() || this.accountNumber.getText().isEmpty()){
+            JOptionPane.showMessageDialog(this, "All field is required");
+        }else{
+            
+            try {
+                connect = new DBConnection().open();
+                Statement stmt = connect.createStatement();
+                String req="SELECT Number,Solde FROM Accounts";
+                ResultSet res = stmt.executeQuery(req);
+                boolean bool =false;
+
+                Double montant = parseDouble(this.montantText.getText()); 
+
+                    while(res.next()){
+                        if(res.getString(1).equals(this.accountNumber.getText())){
+                            Double solde = res.getDouble(2);
+                            if(montant <=0 ){
+                                JOptionPane.showMessageDialog(this, "Amount Invalid");
+                                bool = true;
+                            }else if(montant>=solde){
+                                JOptionPane.showMessageDialog(this, "insufficient balance");
+                                bool =true;
+                            }else{
+                                req = "UPDATE Accounts SET Solde="+(solde-montant)+" WHERE Number = "+res.getString(1);
+                                PreparedStatement pst = connect.prepareStatement(req);
+                                pst.executeUpdate();
+                                JOptionPane.showMessageDialog(this, "Your Solde is :"+(solde-montant));
+                                this.accountNumber.setText("");
+                                this.montantText.setText("");
+                                bool = true;
+                                break;
+                            }
+                            
+                        }
+                    }
+                
+
+                if(!bool){
+                    JOptionPane.showMessageDialog(this, "Account Number not exist");
+                }
+
+
+            } catch (SQLException ex) {
+                Logger.getLogger(DepositView.class.getName()).log(Level.SEVERE, null, ex);
+            }catch(NumberFormatException e){
+                JOptionPane.showMessageDialog(this,"Amount invalid");
+            }
+            
+            try {
+                connect.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(WithdrawView.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }//GEN-LAST:event_depositMouseClicked
 
     private void depositActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_depositActionPerformed
         // TODO add your handling code here:
+        
     }//GEN-LAST:event_depositActionPerformed
 
 

@@ -4,20 +4,19 @@
  */
 package bank;
 
+import java.sql.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.swing.JOptionPane;
 
-/**
- *
- * @author angelo
- */
+    
 public class Login extends javax.swing.JFrame {
 
-    /**
-     * Creates new form Login
-     */
+    private Connection connect;
     public Login() {
         initComponents();
-        
+        connect = new DBConnection().open();
     }
 
     /**
@@ -72,7 +71,7 @@ public class Login extends javax.swing.JFrame {
         jLabel4.setFont(new java.awt.Font("DejaVu Sans", 3, 24)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(102, 102, 102));
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel4.setText("Login");
+        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ressources/icons8-login-64.png"))); // NOI18N
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -103,7 +102,7 @@ public class Login extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 41, Short.MAX_VALUE)
+                .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(34, 34, 34)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -116,7 +115,7 @@ public class Login extends javax.swing.JFrame {
                         .addGap(2, 2, 2)))
                 .addGap(36, 36, 36)
                 .addComponent(loginButton, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(64, Short.MAX_VALUE))
+                .addContainerGap(41, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -142,12 +141,44 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_passwordFieldActionPerformed
 
     private void loginButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_loginButtonMouseClicked
-
-        if(this.idField.getText().equals("admin") && this.passwordField.getText().equals("root")){
+        /*if(this.idField.getText().equals("admin") && this.passwordField.getText().equals("root")){
             new Dashboard().setVisible(true);
             this.dispose();
-        }else{
+          }else{
             JOptionPane.showMessageDialog(this, "ID or Password Incorrect");
+          }*/
+        try{
+            String password="",id="";
+            boolean n= true;
+            Statement stmt = connect.createStatement();
+            String req = "select * from Connexion";
+            ResultSet res = stmt.executeQuery(req);
+            while(res.next()){
+                password = res.getString(2);
+                id = res.getString(1);
+                if(password.equals(this.passwordField.getText()) && id.equals(this.idField.getText()) ){
+                    new Dashboard().setVisible(true);
+                    connect.close();
+                    this.dispose();
+                    n = false;
+                    break;
+                }
+            }
+            if(n){
+                JOptionPane.showMessageDialog(this, "ID or Password Incorrect");
+            }
+            /*System.out.println(password);
+            if(password.equals(this.passwordField.getText())){
+                new Dashboard().setVisible(true);
+                this.dispose();
+            }else{
+                JOptionPane.showMessageDialog(this, "ID or Password Incorrect");
+            } */
+            
+            
+        } catch (SQLException ex) {
+            //Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
 
     }//GEN-LAST:event_loginButtonMouseClicked
@@ -187,6 +218,7 @@ public class Login extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new Login().setVisible(true);
+
             }
         });
     }

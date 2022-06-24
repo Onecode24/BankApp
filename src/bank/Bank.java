@@ -12,13 +12,17 @@ import java.util.ArrayList;
  */
 public class Bank {
     
-    
+    //private Chargement first;
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         
+        Chargement first = new Chargement();
+        first.setVisible(true);
+        first.play();
+        first.dispose();
         new Login().setVisible(true);
     }
     

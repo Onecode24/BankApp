@@ -661,7 +661,7 @@ public class Dashboard extends javax.swing.JFrame {
         int x = this.Container.getWidth();
         int y = this.Container.getHeight();
         this.Container.add(panel);
-        panel.setBounds(0,-10,x,y);
+        panel.setBounds(0,0,x,y);
         panel.setVisible(true);
     }
     

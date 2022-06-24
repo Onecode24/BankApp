@@ -9,20 +9,23 @@ import java.awt.event.ActionListener;
 import static java.lang.Double.parseDouble;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
+import java.sql.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-/**
- *
- * @author angelo
- */
+
+
+
 public class AccountView extends javax.swing.JPanel {
 
-    /**
-     * Creates new form AccountView
-     */
+    private Connection connect;
     
     private ArrayList<Account> list;
     
     public AccountView(ArrayList<Account> accountList) {
+        
+        
+        
         initComponents();
         list = new ArrayList<Account>();
         for(Account i : accountList){
@@ -99,7 +102,7 @@ public class AccountView extends javax.swing.JPanel {
         });
 
         jLabel3.setFont(new java.awt.Font("DejaVu Sans", 0, 15)); // NOI18N
-        jLabel3.setText("Number :");
+        jLabel3.setText("Account Number :");
 
         accountNumber.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -243,7 +246,7 @@ public class AccountView extends javax.swing.JPanel {
     }//GEN-LAST:event_ValiderActionPerformed
 
     private void ValiderMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ValiderMouseClicked
-        String nom= this.OwnerText.getText();
+        /*String nom= this.OwnerText.getText();
         String number = this.accountNumber.getText();
         String sold = this.SoldeText.getText();
         String interes = this.interestText.getText();
@@ -285,6 +288,42 @@ public class AccountView extends javax.swing.JPanel {
                     JOptionPane.showMessageDialog(this,"Solde invalid");
                 }
             }
+        }*/
+        connect = new DBConnection().open();
+        if(this.OwnerText.getText().isEmpty() || this.SoldeText.getText().isEmpty() || this.accountNumber.getText().isEmpty() ){
+            JOptionPane.showMessageDialog(this,"All field are required");
+            
+        }else{
+            try{
+                Double solde;
+                Double interest;
+                solde=parseDouble(this.SoldeText.getText());
+                interest=parseDouble(this.interestText.getText());
+
+                String req = "INSERT INTO Accounts(Owner,Number,Solde,Interest) VALUES(?,?,?,?)";
+                PreparedStatement stmt = connect.prepareStatement(req);
+                stmt.setString(1,this.OwnerText.getText());
+                stmt.setString(2, this.accountNumber.getText());
+                stmt.setDouble(3, solde);
+                stmt.setDouble(4,interest);
+
+                stmt.executeUpdate();
+                
+                this.OwnerText.setText("");
+                this.SoldeText.setText("");
+                this.accountNumber.setText("");
+            }catch (SQLException ex) {
+                //Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this,"This account Number already exist");
+            }catch(NumberFormatException e){
+                JOptionPane.showMessageDialog(this,"Solde invalid");
+            }
+        }
+        try {
+            this.connect.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(AccountView.class.getName()).log(Level.SEVERE, null, ex);
         }
         
     }//GEN-LAST:event_ValiderMouseClicked
